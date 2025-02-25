@@ -2,25 +2,20 @@
  * ================================================
  * Garden Gnomes
  *
- *    /\
- *   ('')
- * __{__}__   /\
- *    #1  |  (oo)
- *        |__{__}__   /\
- *            #2  |  (xx)
- *                |__{__}__
- *                    #3  |
+ * A bunch of gnomes have appeared in your garden!
  *
- * Gnomes are placed on some steps in the garden.
- * The top step is #1, the lowest step is #10
- * - Only one gnome can be on a step at a time
- * - Gnomes can be shifted to different steps,
- *   but only if they are unoccupied
- * - Gnomes can be moved up and down the steps,
- *   but not above the top step (1), nor below the
- *   lowest (10)
- * - If Gnomes are moving up/down, and the target
- *   step is occupied, they take the step before
+ *    /\      /\      /\
+ *   ('')    (oo)    (xx)
+ * __{__}____{__}____{__}__
+ *
+ * Each gnome has a particular activity that it
+ * specialises in: fishing, digging, smoking a
+ * pipe, etc.
+ *
+ * Gnomes are generally friendly little things, but
+ * they do have a bad temper when provoked. If you
+ * poke them, they will get cross. Often a pat on
+ * head can help calm them down
  * ================================================
  */
 
@@ -31,9 +26,23 @@ fun main() {
 
     // Creating gnomes
 
-    val jim = Gnome("Jim", 1)
-    val sam = Gnome("Sam", 5)
-    val amy = Gnome("Amy", 9)
+    val jim = Gnome("Jim", "fishing")
+    val sam = Gnome("Sam", "digging")
+    val amy = Gnome("Amy", "sitting")
+
+    println("------------------------")
+
+    // Checking gnome anger
+
+    check(jim.angerLevel == 1)
+    check(sam.angerLevel == 1)
+    check(amy.angerLevel == 1)
+
+    check(jim.anger() == "calm")
+    check(sam.anger() == "calm")
+    check(amy.anger() == "calm")
+
+    println("------------------------")
 
     // Showing gnome info
 
@@ -41,80 +50,123 @@ fun main() {
     println(sam.info())
     println(amy.info())
 
-    check(jim.info() == "Jim is on step 1")
-    check(sam.info() == "Sam is on step 5")
-    check(amy.info() == "Amy is on step 9")
+    check(jim.info() == "Jim is fishing and is calm")
+    check(sam.info() == "Sam is digging and is calm")
+    check(amy.info() == "Amy is sitting and is calm")
 
-    // Placing gnomes on new steps
+    println("------------------------")
 
-    jim.gotoStep(2)         // Jump to step 2. Should be fine
+    // Poking some gnomes
+
+    jim.poke(1)                     // Should still be calm
     println(jim.info())
-    check(jim.step == 2)
+    check(jim.angerLevel == 2)
+    check(jim.anger() == "calm")
 
-    jim.gotoStep(5)         // Jump to step 5. But it is occupied so should not move
+    jim.poke(1)                     // Should now be annoyed
     println(jim.info())
-    check(jim.step == 2)
+    check(jim.angerLevel == 3)
+    check(jim.anger() == "annoyed")
 
-    // Shifting gnomes
+    jim.poke(10)                    // Should now be max anger
+    println(jim.info())
+    check(jim.angerLevel == 10)
+    check(jim.anger() == "apoplectic")
 
-    sam.moveUp(4)           // Move up to an empty step. Should be fine
+    sam.poke(5)                     // Should now angry
     println(sam.info())
-    check(sam.step == 1)
+    check(sam.angerLevel == 6)
+    check(sam.anger() == "angry")
 
-    sam.moveUp(1)           // Try to move up beyond top step. Should not be possible
-    println(sam.info())
-    check(sam.step == 1)
-
-    amy.moveDown(5)         // Try to move down beyond bottom. Should stop at bottom
+    amy.poke(7)                     // Should now furious
     println(amy.info())
-    check(amy.step == 10)
+    check(amy.angerLevel == 8)
+    check(amy.anger() == "furious")
 
-    jim.moveDown(8)         // Try to move right to bottom. Occupied, so should stop before
-    println(jim.info())
-    check(jim.step == 9)
 
-    jim.moveUp(8)           // Try to move right to top. Occupied, so should stop before
+    println("------------------------")
+
+    // Patting the gnomes to calm them
+
+    jim.pat(9)                      // Should now be calm
     println(jim.info())
-    check(jim.step == 2)
+    check(jim.angerLevel == 1)
+    check(jim.anger() == "calm")
+
+    sam.pat(9)                      // Should now be calm
+    println(sam.info())
+    check(sam.angerLevel == 1)
+    check(sam.anger() == "calm")
+
+    amy.pat(10)                     // Too many pats!
+    println(amy.info())
+    check(amy.angerLevel == 10)
+    check(amy.anger() == "apoplectic")
+
+    amy.pat(9)                      // And calm again
+    println(amy.info())
+    check(amy.angerLevel == 1)
+    check(amy.anger() == "calm")
+
 }
 
 
-class Gnome(val name: String, var step: Int) {
+/**
+ * Gnome class
+ *
+ * Gnomes are instantiated with a name and
+ * an action (e.g. fishing) and have their
+ * anger level initially set to 1 (calm)
+ */
+class Gnome(val name: String, var activity: String) {
+    var angerLevel = 1
+
     init {
         println("Creating a gnome... $name")
     }
 
     /**
      * Show info about the gnome in the form
-     * NAME is on step N
+     *  NAME is ACTIVITY and is ANGER WORD
      */
     fun info(): String {
         return ""
     }
 
     /**
-     * Shift the gnome to a given step
-     * If the step is occupied, don't move
+     * Return a word relating to the gnome's anger level:
+     * - 1-2  -> calm
+     * - 3-4  -> annoyed
+     * - 5-6  -> angry
+     * - 7-8  -> furious
+     * - 9-10 -> apoplectic
      */
-    fun gotoStep(newStep: Int) {
+    fun anger(): String {
+        return ""
+    }
+
+    /**
+     * Poking a gnome makes it angrier
+     * The anger level goes up 1 for
+     * every poke, up to a max of 10
+     */
+    fun poke(numPokes: Int) {
+        println("$name gets poked $numPokes times...")
+
 
     }
 
     /**
-     * Shift the gnome up the given number of steps
-     * If beyond top (1), stop at top. If step is
-     * occupied, go down until a free step is found
+     * Patting a gnome makes it calmer
+     * The anger level goes down 1 for
+     * every pat, down to a min of 1
+     * However, if more than 10 pats are
+     * given in one go, the anger level
+     * will go to 10 instantly!
      */
-    fun moveUp(numSteps: Int) {
+    fun pat(numPats: Int) {
+        println("$name gets patted $numPats times...")
 
-    }
-
-    /**
-     * Shift the gnome down the given number of steps
-     * If beyond bottom (10), stop at bottom. If step
-     * is occupied, go up until a free step is found
-     */
-    fun moveDown(numSteps: Int) {
 
     }
 }
