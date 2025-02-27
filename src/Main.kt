@@ -172,6 +172,10 @@ class Gnome(val name: String, var activity: String) {
      */
     fun pat(numPats: Int) {
         println("$name gets patted $numPats times...")
+        angerLevel = angerLevel - numPats
+        if (numPats >= 10) angerLevel = 10
+        if (angerLevel < 1) angerLevel = 1
+        println("$name is ${anger()}")
 
 
     }
